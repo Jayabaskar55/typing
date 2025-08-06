@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import toast, { Toaster } from "react-hot-toast";
+
+
 import {
   LineChart,
   Line,
@@ -45,7 +47,7 @@ const TypingGame = () => {
   const [gameStarted, setGameStarted] = useState(false);
   const [leaderboard, setLeaderboard] = useState(() => JSON.parse(localStorage.getItem("leaderboard")) || []);
   const [emoji, setEmoji] = useState(null);
-  const [correctStreak, setCorrectStreak] = useState(0);
+  const [correctStreak, setCorrectStreak] = useState();
 
   const timerRef = useRef(null);
   const inputRef = useRef(null);
@@ -110,12 +112,13 @@ const TypingGame = () => {
   };
 
   const handleStop = () => {
-    clearInterval(timerRef.current);
-    setIsFinished(true);
-    setTimeLeft(0);
-    toast.error("⛔ Game stopped!");
-    setInput("");
-  };
+  clearInterval(timerRef.current);
+  setIsFinished(true);
+  setTimeLeft(0);
+  setInput(""); // clear input box
+  toast.error("⛔ Game stopped!");
+};
+
 
   const finishGame = () => {
     const inputWords = input.trim().split(/\s+/);
@@ -154,9 +157,9 @@ const TypingGame = () => {
       setCorrectStreak((prev) => {
         const newStreak = prev + 1;
         if (newStreak >= 5) {
-          setEmoji("💪");
-        } else {
           setEmoji("😃");
+        } else {
+          setEmoji("💪");
         }
         return newStreak;
       });
@@ -201,15 +204,16 @@ const TypingGame = () => {
     setText(newParagraphs[0]);
   };
 
-  const handleKeyDown = (e) => {
-    if (e.key === "Enter") {
-      if (!gameStarted && username.trim() !== "") {
-        handleStart();
-      } else if (gameStarted) {
-        finishGame();
-      }
+const handleKeyDown = (e) => {
+  if (e.key === "Enter") {
+    if (!gameStarted && username.trim() !== "") {
+      handleStart();
+    } else if (gameStarted) {
+      handleStop(); // manually stop game
     }
-  
+  }
+
+
 
 
   return (
